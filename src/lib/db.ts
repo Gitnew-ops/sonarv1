@@ -7,19 +7,21 @@ const globalForPrisma = globalThis as unknown as {
 }
 
 function createPrismaClient(): PrismaClient {
-  const databaseUrl = process.env.TURSO_DATABASE_URL || process.env.DATABASE_URL
-  const authToken = process.env.TURSO_AUTH_TOKEN
+  // Turso/libSQL configuration
+  const tursoUrl = process.env.TURSO_DATABASE_URL
+  const tursoToken = process.env.TURSO_AUTH_TOKEN
 
-  if (databaseUrl && (databaseUrl.startsWith('libsql://') || databaseUrl.startsWith('http'))) {
-    console.log('🔌 Connecting to Turso/libSQL')
+  if (tursoUrl && tursoToken && (tursoUrl.startsWith('libsql://') || tursoUrl.startsWith('http'))) {
+    console.log('🔌 Connecting to Turso:', tursoUrl.substring(0, 40) + '...')
     const libsql = createClient({
-      url: databaseUrl,
-      authToken: authToken,
+      url: tursoUrl,
+      authToken: tursoToken,
     })
     const adapter = new PrismaLibSQL(libsql)
     return new PrismaClient({ adapter })
   }
 
+  // Fallback to local SQLite
   console.log('🔌 Connecting to local SQLite')
   return new PrismaClient({
     log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
