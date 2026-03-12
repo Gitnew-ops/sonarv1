@@ -1,8 +1,9 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
+// SONAR V1.0 - Turso/libSQL SQLite Database
+// Build: 20240312-turso
 
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
 }
 
 datasource db {
@@ -15,7 +16,7 @@ model User {
   email        String   @unique
   password     String
   name         String
-  role         String   @default("USER") // ADMIN or USER
+  role         String   @default("USER")
   isActive     Boolean  @default(true)
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
@@ -27,13 +28,13 @@ model User {
 model Company {
   id           String   @id @default(cuid())
   name         String
-  type         String   @default("SHIPPOWNER") // SHIPOWNER, ARMADOR, BROKER, AGENT
+  type         String   @default("SHIPPOWNER")
   email        String?
   phone        String?
   country      String?
   city         String?
   website      String?
-  status       String   @default("NEW") // NEW, QUALIFIED, CONTACTED, RESPONDED, CLOSED
+  status       String   @default("NEW")
   score        Int      @default(0)
   notes        String?
   lastContact  DateTime?
@@ -51,7 +52,7 @@ model Vessel {
   imo          String?  @unique
   type         String?
   flag         String?
-  status       String   @default("OTHER") // IN_ANGOLA, EN_ROUTE, OTHER
+  status       String   @default("OTHER")
   companyId    String
   company      Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
   createdAt    DateTime @default(now())
@@ -62,8 +63,8 @@ model Campaign {
   id           String   @id @default(cuid())
   name         String
   description  String?
-  status       String   @default("DRAFT") // DRAFT, ACTIVE, PAUSED, COMPLETED
-  serviceType  String?  // DIVING, SHIPCHANDLER, WASTE, BUNKER
+  status       String   @default("DRAFT")
+  serviceType  String?
   startDate    DateTime?
   endDate      DateTime?
   createdAt    DateTime @default(now())
@@ -77,7 +78,7 @@ model Email {
   id           String   @id @default(cuid())
   subject      String
   body         String
-  status       String   @default("QUEUED") // QUEUED, SENT, OPENED, CLICKED, REPLIED, FAILED
+  status       String   @default("QUEUED")
   sentAt       DateTime?
   openedAt     DateTime?
   clickedAt    DateTime?
@@ -95,27 +96,38 @@ model Email {
 
 model Report {
   id           String   @id @default(cuid())
-  type         String   // LEADS, EMAILS, CAMPAIGNS, PERFORMANCE
+  type         String
   title        String?
-  data         String   // JSON string
+  data         String
   generatedAt  DateTime @default(now())
   createdAt    DateTime @default(now())
 }
 
 model Setting {
-  id           String   @id @default(cuid())
+  id          String   @id @default(cuid())
   key         String   @unique
   value       String
-  description  String?
-  updatedAt    DateTime @updatedAt
+  description String?
+  updatedAt   DateTime @updatedAt
 }
 
 model Notification {
-  id           String   @id @default(cuid())
-  type         String   // INFO, WARNING, SUCCESS, ERROR
-  title        String
-  message      String
-  isRead       Boolean  @default(false)
-  link         String?
-  createdAt    DateTime @default(now())
+  id        String   @id @default(cuid())
+  type      String
+  title     String
+  message   String
+  isRead    Boolean  @default(false)
+  link      String?
+  createdAt DateTime @default(now())
+}
+
+model ActivityLog {
+  id        String   @id @default(cuid())
+  action    String
+  entity    String
+  entityId  String?
+  userId    String?
+  userName  String
+  details   String?
+  createdAt DateTime @default(now())
 }
